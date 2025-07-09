@@ -3,3 +3,77 @@ description:
 globs:
 alwaysApply: false
 ---
+# Supabase 세션 기반 사용자 인증 규칙
+
+## 핵심 원칙
+로그인한 사용자의 ID는 **항상 Supabase 세션에서 추출**해야 합니다. 쿼리 파라미터나 request body로 사용자 ID를 전달하지 않습니다.
+
+## API 라우트에서 사용자 인증 방법
+
+### 1. 기본 구조
+```javascript
+import { NextResponse } from 'next/server';
+import { supabase } from '@/lib/supabase';
+
+export async function DELETE(request, { params }) {
+  try {
+    // Authorization 헤더에서 토큰 추출
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { error: '인증이 필요합니다.' },
+        { status: 401 }
+      );
+    }
+
+    const token = authHeader.split(' ')[1];
+    
+    // Supabase 세션에서 사용자 정보 추출
+    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
+    
+    if (userError || !user) {
+      return NextResponse.json(
+        { error: '로그인이 필요합니다.' },
+        { status: 401 }
+      );
+    }
+
+    const userId = user.id; // 세션에서 추출한 사용자 ID 사용
+    
+    // 이후 비즈니스 로직에서 userId 사용
+  } catch (error) {
+    // 에러 처리
+  }
+}
+```
+
+### 2. 클라이언트에서 API 호출
+```javascript
+// 클라이언트에서는 Authorization 헤더만 포함
+const response = await fetch('/api/endpoint', {
+  method: 'DELETE',
+  headers: {
+    'Authorization': `Bearer ${session.access_token}`,
+    'Content-Type': 'application/json'
+  }
+});
+```
+
+## 금지사항
+- ❌ 쿼리 파라미터로 userId 전달: `?userId=${user.id}`
+- ❌ Request body에 userId 포함
+- ❌ 클라이언트에서 사용자 ID 직접 전달
+
+## 권장사항
+- ✅ Authorization 헤더의 JWT 토큰 사용
+- ✅ `supabase.auth.getUser(token)`으로 세션 검증
+- ✅ 서버에서 사용자 ID 추출 및 검증
+- ✅ 보안성과 일관성 유지
+
+## 적용 대상
+- 사용자별 데이터 조회/수정/삭제 API
+- 권한이 필요한 모든 API 엔드포인트
+- SNS 연동 관리 API
+- 게시물 관리 API
+
+이 규칙을 통해 보안성을 높이고 일관된 인증 방식을 유지합니다.
