@@ -1,0 +1,66 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# 파일 구조 관리 규칙
+
+## 디렉토리 구조 원칙
+
+### `/lib` - 전역 공통 라이브러리
+- **용도**: 프로젝트 전체에서 사용되는 공통 라이브러리
+- **포함 대상**: 
+  - Supabase 설정 및 인증 관련 기본 설정
+  - 데이터베이스 연결 설정
+  - 전역 설정 파일
+  - 외부 서비스 연동 기본 설정
+- **예시**: [supabase.js](mdc:lib/supabase.js)
+
+### `/app/lib` - 앱 컴포넌트 전용 유틸리티
+- **용도**: 앱 내 컴포넌트들이 사용하는 특화된 유틸리티
+- **포함 대상**:
+  - 커스텀 훅 (useAuthGuard 등)
+  - 컴포넌트별 로직
+  - 앱 특화 헬퍼 함수
+  - 페이지별 유틸리티
+- **예시**: [useAuthGuard.js](mdc:app/lib/useAuthGuard.js)
+
+## 파일 생성 및 수정 시 주의사항
+
+⚠️ **절대 규칙**: 
+- 이미 올바른 위치에 있는 파일을 다른 위치에 재생성하지 마세요
+- 기존 파일 구조를 변경하기 전에 반드시 현재 구조를 확인하세요
+
+## Import 경로 가이드
+
+### 각 페이지에서의 올바른 import 경로:
+
+**대시보드 페이지** (`/app/dashboard/page.js`):
+```javascript
+import { auth, supabase } from '../../lib/supabase';
+import useAuthGuard from '../lib/useAuthGuard';
+```
+
+**Instagram 연결 페이지** (`/app/connections/instagram/page.js`):
+```javascript
+import { auth } from '../../../lib/supabase';
+import useAuthGuard from '../../lib/useAuthGuard';
+```
+
+**게시글 작성 페이지** (`/app/posts/createPost/page.js`):
+```javascript
+import { auth } from '../../../lib/supabase';
+import useAuthGuard from '../../lib/useAuthGuard';
+```
+
+## 파일 작업 체크리스트
+
+새로운 파일을 생성하거나 기존 파일을 수정할 때:
+
+1. ✅ 파일의 용도가 전역 공통 라이브러리인가? → `/lib`
+2. ✅ 파일의 용도가 앱 컴포넌트 전용 유틸리티인가? → `/app/lib`
+3. ✅ 기존 파일 위치를 확인했는가?
+4. ✅ Import 경로가 올바른가?
+5. ✅ 중복 파일을 생성하지 않았는가?
+
+이 규칙을 따라 일관된 파일 구조를 유지하고 코드의 유지보수성을 높입니다.

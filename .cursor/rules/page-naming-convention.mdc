@@ -1,0 +1,20 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# 페이지 파일 디렉토리 명명 규칙
+
+
+## 명명 규칙
+- 카멜케이스(camelCase) 사용
+- 하이픈이나 언더스코어 대신 카멜케이스로 변환
+- 명확하고 의미있는 이름 사용
+
+## 예시
+- `forgot-password` → `forgetPassword`
+- `user-profile` → `userProfile`
+- `settings-page` → `settings`
+- `contact-us` → `contactUs.`
+
+이 규칙을 따라 모든 새로운 페이지 파일 디렉토리를 생성해주세요.
