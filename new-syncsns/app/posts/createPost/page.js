@@ -17,7 +17,6 @@ export default function CreatePostPage() {
     selectedPlatforms: [],
     images: []
   });
-  // test
   const [uiState, setUiState] = useState({
     isPublishing: false,
     isUploadingImages: false,
